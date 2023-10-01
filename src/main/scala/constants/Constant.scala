@@ -2,7 +2,23 @@ package constants
 
 import org.apache.spark.sql.functions._
 
-class Constant {
+object ConstantTarget {
+
+    val HasTargetCancelFly = col("CANCELLED") === 0
+    
+    val HasTargetDepartureDelay = col("DepartureDelay") === 0
+
+    val HasTargetArrivalDelay = col("ArrivalDelay") === 0
+
+    val HasTargetDelay = ((col("AirSystemDelay") =!= 0)
+                        || (col("SecurityDelay") =!= 0)
+                        || (col("AirlineDelay") =!= 0)
+                        || (col("LateAircraftDelay") =!= 0)
+                        || (col("WeatherDelay") =!= 0))
+
+}
+
+object ConstantColumns {
 
     val HasDayWeekColumns = Seq[String](  
         "DayOfWeek",
@@ -28,18 +44,6 @@ class Constant {
         "LateAircraftDelay",
         "WeatherDelay")
 
-    val HasTargetCancelFly = col("CANCELLED") === 0
-    
-    val HasTargetDepartureDelay = col("DepartureDelay") === 0
-
-    val HasTargetArrivalDelay = col("ArrivalDelay") === 0
-
-    val HasTargetDelay = ((col("AirSystemDelay") =!= 0)
-                        || (col("SecurityDelay") =!= 0)
-                        || (col("AirlineDelay") =!= 0)
-                        || (col("LateAircraftDelay") =!= 0)
-                        || (col("WeatherDelay") =!= 0))
-
     val HasColumnsForGroup = Seq[String](  
         "AirSystemDelayCount", 
         "SecurityDelayCount",
@@ -47,3 +51,4 @@ class Constant {
         "LateAircraftDelayCount",
         "WeatherDelayCount")
 }
+
