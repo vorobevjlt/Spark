@@ -1,36 +1,34 @@
 package jobs
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.Column 
+import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import readers.DataFrameTableReader
 import readers.DataFrameReader
-import transformers.DataFrameTableTransformer
-import writers.DataFrameTableWriter
+import transformers.DataFrameTransformer
 import writers.DataFrameWriter
-import preprocessing.DataFrameTableCleaner
-import metrics.DataFrameTableAction
+import preprocessing.DataFrameCleaner
+import metrics.DataFrameMetricCalculator
 import constants.{ConstantTarget, ConstantColumns}
 
 case class JobConfig(
-    airportReaderConfig: DataFrameTableReader.ReadConfig,
-    flyReaderConfig: DataFrameTableReader.ReadConfig, 
-    airlineReaderConfig: DataFrameTableReader.ReadConfig,
-    topAirlinesConfig: DataFrameTableReader.ReadConfig,
-    topAirportConfig: DataFrameTableReader.ReadConfig,
-    topFlyInOneDirectionByAirportConfig: DataFrameTableReader.ReadConfig,
-    topWeekDaysByArrivalDelayConfig: DataFrameTableReader.ReadConfig,
-    countDelayReasonConfig: DataFrameTableReader.ReadConfig,
-    percentageDelayReasonConfig: DataFrameTableReader.ReadConfig,
-    metaInfoConfig: DataFrameTableReader.ReadConfig,
-    writeAirportConfig: DataFrameTableWriter.WriteConfig,
-    writeAirlinesConfig: DataFrameTableWriter.WriteConfig,
-    writetopFlyInOneDirectionByAirportConfig: DataFrameTableWriter.WriteConfig,
-    writeTopWeekDaysByArrivalDelayConfig: DataFrameTableWriter.WriteConfig,
-    writeCountDelayReasonConfig: DataFrameTableWriter.WriteConfig,
-    writegetPercentageDelayReasonConfig: DataFrameTableWriter.WriteConfig,
-    writeMetaInfoConfig: DataFrameTableWriter.WriteConfig
+    airportReaderConfig: DataFrameReader.ReadConfig,
+    flyReaderConfig: DataFrameReader.ReadConfig, 
+    airlineReaderConfig: DataFrameReader.ReadConfig,
+    topAirlinesConfig: DataFrameReader.ReadConfig,
+    topAirportConfig: DataFrameReader.ReadConfig,
+    topFlyInOneDirectionByAirportConfig: DataFrameReader.ReadConfig,
+    topWeekDaysByArrivalDelayConfig: DataFrameReader.ReadConfig,
+    countDelayReasonConfig: DataFrameReader.ReadConfig,
+    percentageDelayReasonConfig: DataFrameReader.ReadConfig,
+    metaInfoConfig: DataFrameReader.ReadConfig,
+    writeAirportConfig: DataFrameWriter.WriteConfig,
+    writeAirlinesConfig: DataFrameWriter.WriteConfig,
+    writetopFlyInOneDirectionByAirportConfig: DataFrameWriter.WriteConfig,
+    writeTopWeekDaysByArrivalDelayConfig: DataFrameWriter.WriteConfig,
+    writeCountDelayReasonConfig: DataFrameWriter.WriteConfig,
+    writegetPercentageDelayReasonConfig: DataFrameWriter.WriteConfig,
+    writeMetaInfoConfig: DataFrameWriter.WriteConfig
     )
 
 class FlyghtAnalysisJob (
@@ -40,113 +38,113 @@ class FlyghtAnalysisJob (
    override def run(): Unit = {
 
       val getAirport = {
-        new DataFrameTableReader(
+        new DataFrameReader(
           spark, 
           config.airportReaderConfig)
       }
 
       val getfly = {
-        new DataFrameTableReader(
+        new DataFrameReader(
           spark, 
           config.flyReaderConfig)
       }
 
       val getAirline = {
-        new DataFrameTableReader(
+        new DataFrameReader(
           spark, 
           config.airlineReaderConfig)
       }
 
       val getArchiveTopAirlines = {
-        new DataFrameTableReader(
+        new DataFrameReader(
           spark, 
           config.topAirlinesConfig)
       }
 
       val getArchiveTopAirport = {
-        new DataFrameTableReader(
+        new DataFrameReader(
           spark, 
           config.topAirportConfig)
       }
 
       val getArchiveFlyInOneDirectionByAirport = {
-        new DataFrameTableReader(
+        new DataFrameReader(
           spark, 
           config.topFlyInOneDirectionByAirportConfig)
       }
 
       val getArchiveTopWeekDays = {
-        new DataFrameTableReader(
+        new DataFrameReader(
           spark, 
           config.topWeekDaysByArrivalDelayConfig)
       }
 
       val getArchiveCountDelayReason = {
-        new DataFrameTableReader(
+        new DataFrameReader(
           spark, 
           config.countDelayReasonConfig)
       }
 
       val getArchivePercentageDelayReason = {
-        new DataFrameTableReader(
+        new DataFrameReader(
           spark, 
           config.percentageDelayReasonConfig)
       }
 
       val getArchiveMetaInfo = {
-        new DataFrameTableReader(
+        new DataFrameReader(
           spark, 
           config.metaInfoConfig)
       }
 
       val writeTopAirport = {
-        new DataFrameTableWriter(
+        new DataFrameWriter(
           spark, 
           config.writeAirportConfig)
       }
 
       val writeTopAirlines = {
-        new DataFrameTableWriter(
+        new DataFrameWriter(
           spark, 
           config.writeAirlinesConfig)
       }
 
       val writeTopFlyInOneDirectionByAirport = {
-        new DataFrameTableWriter(
+        new DataFrameWriter(
           spark, 
           config.writetopFlyInOneDirectionByAirportConfig)
       }
       val writeTopWeekDaysByArrivalDelay = {
-        new DataFrameTableWriter(
+        new DataFrameWriter(
           spark, 
           config.writeTopWeekDaysByArrivalDelayConfig)
       }
       val writeCountDelayReason = {
-        new DataFrameTableWriter(
+        new DataFrameWriter(
           spark, 
           config.writeCountDelayReasonConfig)
       }
       val writeGetPercentageDelayReason = {
-        new DataFrameTableWriter(
+        new DataFrameWriter(
           spark, 
           config.writegetPercentageDelayReasonConfig)
       }
       val writeMetaInfo = {
-        new DataFrameTableWriter(
+        new DataFrameWriter(
           spark, 
           config.writeMetaInfoConfig)
       }
 
-      def isTransformer(): DataFrameTableTransformer = {
-        new DataFrameTableTransformer()
+      def isTransformer(): DataFrameTransformer = {
+        new DataFrameTransformer()
       }
 
-      def isAction(): DataFrameTableAction = {
-        new DataFrameTableAction()
+      def isAction(): DataFrameMetricCalculator = {
+        new DataFrameMetricCalculator()
       }
 
-      def isPreprocess(): DataFrameTableCleaner = {
-        new DataFrameTableCleaner()
+      def isPreprocess(): DataFrameCleaner = {
+        new DataFrameCleaner()
       }
       
       def getTop10ByKey(
@@ -202,7 +200,7 @@ class FlyghtAnalysisJob (
       val archiveDF = 
         isTransformer().chekDate(ArchiveMetaInfoDF)
       
-      if(incomeDF == archiveDF) println("Wrong data")
+      if(1 == 1) println("Wrong data")
         else { 
         
           val airportDF = getAirport.read()
@@ -282,7 +280,7 @@ class FlyghtAnalysisJob (
             .transform(isPreprocess()
               .getTargetColumns(ConstantColumns.HasAirportColumns))
             .transform(isPreprocess()
-              .dropNoNullValues)
+              .dropNullValues)
             .transform(getTop10ByKey(ConstantTarget.HasTargetCancelFly, 
                                     "airportID", 
                                     airportDF))
@@ -294,7 +292,7 @@ class FlyghtAnalysisJob (
             .transform(isPreprocess()
               .getTargetColumns(ConstantColumns.HasAirlineColumns))
             .transform(isPreprocess()
-              .dropNoNullValues)
+              .dropNullValues)
             .transform(getTop10ByKey(ConstantTarget.HasTargetDepartureDelay, 
                                     "airlineID", 
                                     airlineDF))
@@ -306,7 +304,7 @@ class FlyghtAnalysisJob (
             .transform(isPreprocess()
               .getTargetColumns(ConstantColumns.HasDestinationColumns))
             .transform(isPreprocess()
-              .dropNoNullValues)
+              .dropNullValues)
             .transform(isTransformer()
               .countTwoGroupsByKey)
             .transform(isTransformer()
