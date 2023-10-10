@@ -13,7 +13,7 @@ import constants.{ConstantTarget, ConstantColumns}
 
 case class JobConfig(
     airportReaderConfig: DataFrameReader.ReadConfig,
-    flyReaderConfig: DataFrameReader.ReadConfig, 
+    flightsReaderConfig: DataFrameReader.ReadConfig, 
     airlineReaderConfig: DataFrameReader.ReadConfig,
     topAirlinesConfig: DataFrameReader.ReadConfig,
     topAirportConfig: DataFrameReader.ReadConfig,
@@ -43,10 +43,10 @@ class FlyghtAnalysisJob (
           config.airportReaderConfig)
       }
 
-      val getfly = {
+      val getFlights = {
         new DataFrameReader(
           spark, 
-          config.flyReaderConfig)
+          config.flightsReaderConfig)
       }
 
       val getAirline = {
@@ -175,32 +175,37 @@ class FlyghtAnalysisJob (
             .orderedDataByColumn("count"))
       }
 
-      val flyDF = getfly.read()
+      val flightsDF = getFlights.read()
 
       val ArchiveMetaInfoDF = getArchiveMetaInfo.read()
 
-      val withCollectedProcessedColDF = flyDF
+      val newMetaInfoDF = flightsDF
         .transform(isTransformer()
             .getMetaInfoDF)
             
-      val withIdColArchiveDF = ArchiveMetaInfoDF
+      val archiveMetaInfoDF = ArchiveMetaInfoDF
           .transform(isTransformer()
             .withIdColumnForJoin)
 
-      val metaInfoDF = withCollectedProcessedColDF
+      val withJoinedMetaInfoDF = newMetaInfoDF
         .transform(isTransformer()
-            .joinTables(withIdColArchiveDF, "id"))
+            .joinTables(archiveMetaInfoDF, "id"))
         .transform(isTransformer()
             .withConcatColumns)
+      
+      val getDiffDays = isAction()
+            .getDaysDiffValue(withJoinedMetaInfoDF)
+
+      val metaInfoDF = withJoinedMetaInfoDF
         .transform(isTransformer()
-            .checkTableByCondition(ArchiveMetaInfoDF))
+            .getResultMetaInfo(getDiffDays, ArchiveMetaInfoDF))
 
       val incomeDF = 
         isTransformer().chekDate(metaInfoDF)
       val archiveDF = 
         isTransformer().chekDate(ArchiveMetaInfoDF)
       
-      if(1 == 1) println("Wrong data")
+      if(incomeDF == archiveDF) println("Wrong data")
         else { 
         
           val airportDF = getAirport.read()
@@ -221,44 +226,44 @@ class FlyghtAnalysisJob (
 
           val CountAirSystemDelay = 
             isAction()
-              .countDelayReasonFunc("AirSystemDelay")(flyDF)
+              .countDelayReason("AirSystemDelay")(flightsDF)
 
           val CountSecurityDelay = 
             isAction()
-              .countDelayReasonFunc("SecurityDelay")(flyDF)
+              .countDelayReason("SecurityDelay")(flightsDF)
 
           val CountAirlineDelay =
             isAction()
-              .countDelayReasonFunc("AirlineDelay")(flyDF)                                                 
+              .countDelayReason("AirlineDelay")(flightsDF)                                                 
 
           val CountLateAircraftDelay = 
             isAction()
-              .countDelayReasonFunc("LateAircraftDelay")(flyDF)
+              .countDelayReason("LateAircraftDelay")(flightsDF)
 
           val CountWeatherDelay = 
             isAction()
-              .countDelayReasonFunc("WeatherDelay")(flyDF)
+              .countDelayReason("WeatherDelay")(flightsDF)
 
 
           val sumAirSystemDelay = 
             isAction()
-              .sumDelayReasonFunc("AirSystemDelay")(flyDF)
+              .getDelayReasonSum("AirSystemDelay")(flightsDF)
 
           val sumSecurityDelay = 
             isAction()
-              .sumDelayReasonFunc("SecurityDelay")(flyDF)
+              .getDelayReasonSum("SecurityDelay")(flightsDF)
 
           val sumAirlineDelay = 
             isAction()
-              .sumDelayReasonFunc("AirlineDelay")(flyDF)                                                 
+              .getDelayReasonSum("AirlineDelay")(flightsDF)                                                 
 
           val sumLateAircraftDelay = 
             isAction()
-              .sumDelayReasonFunc("LateAircraftDelay")(flyDF)
+              .getDelayReasonSum("LateAircraftDelay")(flightsDF)
 
           val sumWeatherDelay = 
             isAction()
-              .sumDelayReasonFunc("WeatherDelay")(flyDF)
+              .getDelayReasonSum("WeatherDelay")(flightsDF)
 
 
           val countDelay: Array[Long] = 
@@ -276,7 +281,7 @@ class FlyghtAnalysisJob (
                     sumWeatherDelay)  
 
 
-          val topAirportDF = flyDF
+          val topAirportDF = flightsDF
             .transform(isPreprocess()
               .getTargetColumns(ConstantColumns.HasAirportColumns))
             .transform(isPreprocess()
@@ -288,7 +293,7 @@ class FlyghtAnalysisJob (
               .withUpdateTable(ArchiveTopAirportDF))
             .transform(getGroupAndOrder)
 
-          val topAirlinesDF = flyDF
+          val topAirlinesDF = flightsDF
             .transform(isPreprocess()
               .getTargetColumns(ConstantColumns.HasAirlineColumns))
             .transform(isPreprocess()
@@ -300,7 +305,7 @@ class FlyghtAnalysisJob (
               .withUpdateTable(ArchiveTopAirlinesDF))
             .transform(getGroupAndOrder)
 
-          val topFlyInOneDirectionByAirportDF = flyDF
+          val topFlyInOneDirectionByAirportDF = flightsDF
             .transform(isPreprocess()
               .getTargetColumns(ConstantColumns.HasDestinationColumns))
             .transform(isPreprocess()
@@ -321,7 +326,7 @@ class FlyghtAnalysisJob (
               .withUpdateTable(ArchiveTopFlyDF))
             .transform(getGroupAndOrder)
 
-          val topWeekDaysByArrivalDelayDF = flyDF
+          val topWeekDaysByArrivalDelayDF = flightsDF
             .transform(isPreprocess()
               .getTargetColumns(ConstantColumns.HasDayWeekColumns))
             .transform(isTransformer()
@@ -333,7 +338,7 @@ class FlyghtAnalysisJob (
             .transform(isTransformer()
               .sumValuesByKey("DayOfWeek", "count"))
 
-          val delayByReasonDF = flyDF
+          val delayByReasonDF = flightsDF
             .transform(isPreprocess()
               .getTargetColumns(ConstantColumns.HasDelayColumns))
             .transform(isTransformer()

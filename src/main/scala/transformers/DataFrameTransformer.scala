@@ -17,7 +17,24 @@ object DFColumn extends DFColumn {
 trait DFColumn extends Enumeration {
   val airportID,
       DestinationAiport,
-      id = Value
+      id,
+      AirSystemDelaySum,
+      SecurityDelaySum,
+      AirlineDelaySum,
+      LateAircraftDelaySum,
+      WeatherDelayCountSum,
+      SumDelayReason,
+      AirSystemDelayPercentage,
+      SecurityDelayPercentage,
+      AirlineDelayPercentage,
+      LateAircraftDelayPercentage,
+      WeatherDelayCountPercentage,
+      AirSystemDelayCount, 
+      SecurityDelayCount,
+      AirlineDelayCount,
+      LateAircraftDelayCount,  
+      WeatherDelayCount = Value
+
 }
 
 class DataFrameTransformer extends Transformer{
@@ -107,11 +124,11 @@ class DataFrameTransformer extends Transformer{
       .withColumn("AirlineDelayCount", lit(values(2)))
       .withColumn("LateAircraftDelayCount", lit(values(3)))
       .withColumn("WeatherDelayCount", lit(values(4)))
-      .select(col("AirSystemDelayCount"),  
-              col("SecurityDelayCount"),
-              col("AirlineDelayCount"),
-              col("LateAircraftDelayCount"),
-              col("WeatherDelayCount"))
+      .select(col(DFColumn.AirSystemDelayCount),  
+              col(DFColumn.SecurityDelayCount),
+              col(DFColumn.AirlineDelayCount),
+              col(DFColumn.LateAircraftDelayCount),
+              col(DFColumn.WeatherDelayCount))
       .limit(1)
 
   }
@@ -139,12 +156,12 @@ class DataFrameTransformer extends Transformer{
       .withColumn("WeatherDelayCountSum", lit(values(4)))
       .withColumn("SumDelayReason", lit(arraySum))
       .select(
-              col("AirSystemDelaySum"),
-              col("SecurityDelaySum"),
-              col("AirlineDelaySum"),
-              col("LateAircraftDelaySum"),
-              col("WeatherDelayCountSum"),
-              col("SumDelayReason"))
+              col(DFColumn.AirSystemDelaySum),
+              col(DFColumn.SecurityDelaySum),
+              col(DFColumn.AirlineDelaySum),
+              col(DFColumn.LateAircraftDelaySum),
+              col(DFColumn.WeatherDelayCountSum),
+              col(DFColumn.SumDelayReason))
       .limit(1)
   }
 
@@ -176,17 +193,17 @@ class DataFrameTransformer extends Transformer{
       .withColumn("LateAircraftDelayPercentage", lit(LateAircraftDelayPercentage))
       .withColumn("WeatherDelayCountPercentage", lit(WeatherDelayCountPercentage))
       .select(
-              col("AirSystemDelayPercentage"),  
-              col("SecurityDelayPercentage"),
-              col("AirlineDelayPercentage"),
-              col("LateAircraftDelayPercentage"),
-              col("WeatherDelayCountPercentage"),
-              col("AirSystemDelaySum"),
-              col("SecurityDelaySum"),
-              col("AirlineDelaySum"),
-              col("LateAircraftDelaySum"),
-              col("WeatherDelayCountSum"),
-              col("SumDelayReason"))
+              col(DFColumn.AirSystemDelayPercentage),  
+              col(DFColumn.SecurityDelayPercentage),
+              col(DFColumn.AirlineDelayPercentage),
+              col(DFColumn.LateAircraftDelayPercentage),
+              col(DFColumn.WeatherDelayCountPercentage),
+              col(DFColumn.AirSystemDelaySum),
+              col(DFColumn.SecurityDelaySum),
+              col(DFColumn.AirlineDelaySum),
+              col(DFColumn.LateAircraftDelaySum),
+              col(DFColumn.WeatherDelayCountSum),
+              col(DFColumn.SumDelayReason))
     }
 
     override def withUpdateTable(archiveDF: DataFrame)(newDF: DataFrame): DataFrame = {
@@ -199,22 +216,22 @@ class DataFrameTransformer extends Transformer{
       val selectArchive = 
         archiveDF
         .select(
-              col("AirSystemDelaySum"),
-              col("SecurityDelaySum"),
-              col("AirlineDelaySum"),
-              col("LateAircraftDelaySum"),
-              col("WeatherDelayCountSum"),
-              col("SumDelayReason"))
+              col(DFColumn.AirSystemDelaySum),
+              col(DFColumn.SecurityDelaySum),
+              col(DFColumn.AirlineDelaySum),
+              col(DFColumn.LateAircraftDelaySum),
+              col(DFColumn.WeatherDelayCountSum),
+              col(DFColumn.SumDelayReason))
 
       val selectData = 
         newDF
         .select(
-              col("AirSystemDelaySum"),
-              col("SecurityDelaySum"),
-              col("AirlineDelaySum"),
-              col("LateAircraftDelaySum"),
-              col("WeatherDelayCountSum"),
-              col("SumDelayReason"))
+              col(DFColumn.AirSystemDelaySum),
+              col(DFColumn.SecurityDelaySum),
+              col(DFColumn.AirlineDelaySum),
+              col(DFColumn.LateAircraftDelaySum),
+              col(DFColumn.WeatherDelayCountSum),
+              col(DFColumn.SumDelayReason))
 
       selectArchive
             .union(selectData)
@@ -270,13 +287,8 @@ class DataFrameTransformer extends Transformer{
           )
     }
 
-    override def checkTableByCondition(archiveDF: DataFrame)(df: DataFrame): DataFrame = {
-      val flag1 = df
-        .withColumn("diff", datediff(col("fromIN"), col("toAR")))
-        .select("diff")
-        .first.getInt(0)
-
-      if(flag1 >= 0) df.select("collected", "processed")
+    override def getResultMetaInfo(dayCount: Int, archiveDF: DataFrame)(df: DataFrame): DataFrame = {
+      if(dayCount >= 0) df.select("collected", "processed")
       else archiveDF
     }    
 
@@ -286,4 +298,5 @@ class DataFrameTransformer extends Transformer{
       df
       .join(bDecodeDF, id)
     }
+
 }

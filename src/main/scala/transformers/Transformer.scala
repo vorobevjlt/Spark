@@ -23,6 +23,6 @@ trait Transformer {
     def chekDate(df: DataFrame): String
     def withIdColumnForJoin(df: DataFrame): DataFrame
     def withConcatColumns(df: DataFrame): DataFrame
-    def checkTableByCondition(archiveDF: DataFrame)(df: DataFrame): DataFrame
+    def getResultMetaInfo(dayCount: Int, archiveDF: DataFrame)(df: DataFrame): DataFrame
     def extractColumnsByTarget(column: String)(df: DataFrame): DataFrame
 }
