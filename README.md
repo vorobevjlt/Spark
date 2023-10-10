@@ -9,5 +9,8 @@ For more information on the sbt-dotty plugin, see the
 
 docker-compose up --scale spark-worker=3
 
+docker exec -it spark-cluster_spark-master_1 bash
+
 ./spark/bin/spark-submit --class com.example.FlightAnalyzer --deploy-mode client --master spark://060b3fb76d8e:7077 --verbose --supervise /opt/spark-apps/spark-stepik_2.12-0.1.jar /opt/spark-data/airports.csv /opt/spark-data/fli.csv /opt/spark-data/airlines.csv /opt/spark-data/dataArchiveForRead2/TopAirlines /opt/spark-data/dataArchiveForRead2/TopAirport /opt/spark-data/dataArchiveForRead2/TopFlyInOneDirectionByAirport /opt/spark-data/dataArchiveForRead2/TopWeekDaysByArrivalDelay /opt/spark-data/dataArchiveForRead2/CountDelayReason /opt/spark-data/dataArchiveForRead2/PercentageDelayReason /opt/spark-data/dataArchiveForRead2/MetaInfo
 # SparkProject-FlightsAnalyze
+# Spark
