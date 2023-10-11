@@ -37,49 +37,53 @@ trait DFColumn extends Enumeration {
 
 }
 
+object DataFrameTransformer {
+
+  val isZero = (column: String) => col(column) === 0
+
+}
+
 class DataFrameTransformer extends Transformer{
 
     override def extractColumnsByTarget(column: String)(df: DataFrame): DataFrame = {
-      val condition = col(column) =!= 0
-
       df
         .select(col(column))
-        .filter(condition)
-  }
+        .filter(!DataFrameTransformer.isZero(column))
+    }
 
     override def hasTargetedData(target: Column)(df: DataFrame): DataFrame = {
       df
-      .filter(target)
+        .filter(target)
     }
 
     override def countOneGroupByKey(id: String)(df: DataFrame): DataFrame = {
       df
-      .groupBy(col(id))
-      .count()
+        .groupBy(col(id))
+        .count()
     }
 
     override def countTwoGroupsByKey(df: DataFrame): DataFrame = {
       df
-      .groupBy(col(DFColumn.airportID),col(DFColumn.DestinationAiport))
-      .agg(count(lit(1)).alias("count"))
+        .groupBy(col(DFColumn.airportID),col(DFColumn.DestinationAiport))
+        .agg(count(lit(1)).alias("count"))
     }
 
     override def sumValuesByKey(id: String, column: String)(df: DataFrame): DataFrame = {
-        df
+      df
         .groupBy(col(id))
         .agg(sum(column).as(column))
     }
 
     override def sumValuesByGroupKey(df: DataFrame): DataFrame = {
-        df
-        .groupBy(col(DFColumn.id))
-        .agg(
+      df
+      .groupBy(col(DFColumn.id))
+      .agg(
           sum("AirSystemDelayCount").as("AirSystemDelayCount"),
           sum("SecurityDelayCount").as("SecurityDelayCount"),
           sum("AirlineDelayCount").as("AirlineDelayCount"),
           sum("LateAircraftDelayCount").as("LateAircraftDelayCount"),
           sum("WeatherDelayCount").as("WeatherDelayCount"))
-        .drop("id")
+      .drop("id")
     }
      
     override def orderedDataByColumn(col: String)(df: DataFrame): DataFrame = {
