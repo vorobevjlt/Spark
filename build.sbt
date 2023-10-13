@@ -1,4 +1,4 @@
-name := "spark-stepik"
+name := "Flights Analyzer"
 
 version := "0.1"
 
