@@ -10,21 +10,21 @@ import schemas.Schema
 
 object FlightAnalyzer extends Config {
 
-  def main(args: Array[String]): Unit = {
+  def main(clasterPath: Array[String]): Unit = {
     
-    args match {
-      case items if (items.length == 10 || items.length == 0) => Config(args)
-      case _ => throw new IllegalArgumentException(s"Not enough files, have to be 10 but ${args.length} found")
+    clasterPath match {
+      case path if (path.length == 10 || path.length == 0) => Config(path)
+      case _ => throw new IllegalArgumentException(s"Not enough files, have to be 10 but ${clasterPath.length} found")
     }
 
     object Config extends Config{
-        def apply(args: Array[String] = Array()): Unit = {
-            args match {
-                case rec if(rec.nonEmpty) => RunConfig(args)
+        def apply(clasterPath: Array[String] = Array()): Unit = {
+            clasterPath match {
+                case path if(path.nonEmpty) => RunConfig(path)
                 case _ => RunConfig(localPath)       
             }
         }
-        }
+      }
 
     object RunConfig extends Config with SessionWrapper {
         def apply(readPath: Array[String]): Unit = {
