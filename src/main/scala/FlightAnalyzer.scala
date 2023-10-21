@@ -1,6 +1,7 @@
 package com.example
 
 import configs.Config
+import utils.{Util, UtilOverride}
 import jobs.{Job, JobConfig, FlyghtAnalysisJob}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
@@ -8,15 +9,12 @@ import writers.DataFrameWriter
 import readers.DataFrameReader
 import schemas.Schema
 
-object FlightAnalyzer extends Config with SessionWrapper{
+object FlightAnalyzer extends UtilOverride with SessionWrapper with Config{
 
     def main(args: Array[String]): Unit = {
         require(args.length == 10 || args.length == 0 ,"Not enough files")    
         
-        val readPath = args match {
-        case items if (items.length == 10) => items
-        case _ => localPath
-        }
+        val readPath = getPath(args)
 
         val job = new FlyghtAnalysisJob(
                         spark,
