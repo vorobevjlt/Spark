@@ -4,7 +4,7 @@ import org.apache.spark.sql.functions._
 
 object ConstantPath {
 
-    val HasReadPath = Array(
+    val ReadPath = Array(
         "src/main/resources/dataArchiveForRead/airports.csv",
         "src/main/resources/dataArchiveForRead/flights.csv",
         "src/main/resources/dataArchiveForRead/airlines.csv",
@@ -17,7 +17,7 @@ object ConstantPath {
         "src/main/resources/dataArchiveForRead/MetaInfo"
     )
 
-    val HasWritePath = Array(
+    val WritePath = Array(
         "src/main/resources/dataArchiveForWrite/TopAirlines",
         "src/main/resources/dataArchiveForWrite/TopAirport",
         "src/main/resources/dataArchiveForWrite/TopFlyInOneDirectionByAirport",

@@ -123,11 +123,11 @@ class DataFrameTransformer extends Transformer{
 
     override def withCountDealyReason(values: Array[Long])(df: DataFrame): DataFrame ={
       df
-      .withColumn("AirSystemDelayCount", lit(values(0)))
-      .withColumn("SecurityDelayCount", lit(values(1)))
-      .withColumn("AirlineDelayCount", lit(values(2)))
-      .withColumn("LateAircraftDelayCount", lit(values(3)))
-      .withColumn("WeatherDelayCount", lit(values(4)))
+      .withColumn(DFColumn.AirSystemDelayCount, lit(values(0)))
+      .withColumn(DFColumn.SecurityDelayCount, lit(values(1)))
+      .withColumn(DFColumn.AirlineDelayCount, lit(values(2)))
+      .withColumn(DFColumn.LateAircraftDelayCount, lit(values(3)))
+      .withColumn(DFColumn.WeatherDelayCount, lit(values(4)))
       .select(col(DFColumn.AirSystemDelayCount),  
               col(DFColumn.SecurityDelayCount),
               col(DFColumn.AirlineDelayCount),
@@ -153,12 +153,12 @@ class DataFrameTransformer extends Transformer{
       val arraySum = values.reduceLeft[Long](_ + _).toDouble
 
       df
-      .withColumn("AirSystemDelaySum", lit(values(0)))
-      .withColumn("SecurityDelaySum", lit(values(1)))
-      .withColumn("AirlineDelaySum", lit(values(2)))
-      .withColumn("LateAircraftDelaySum", lit(values(3)))
-      .withColumn("WeatherDelayCountSum", lit(values(4)))
-      .withColumn("SumDelayReason", lit(arraySum))
+      .withColumn(DFColumn.AirSystemDelaySum, lit(values(0)))
+      .withColumn(DFColumn.SecurityDelaySum, lit(values(1)))
+      .withColumn(DFColumn.AirlineDelaySum, lit(values(2)))
+      .withColumn(DFColumn.LateAircraftDelaySum, lit(values(3)))
+      .withColumn(DFColumn.WeatherDelayCountSum, lit(values(4)))
+      .withColumn(DFColumn.SumDelayReason, lit(arraySum))
       .select(
               col(DFColumn.AirSystemDelaySum),
               col(DFColumn.SecurityDelaySum),
@@ -191,11 +191,11 @@ class DataFrameTransformer extends Transformer{
       val WeatherDelayCountPercentage = (fWeatherDelayCountPercentage/fSumDelayReason)*100
 
       df
-      .withColumn("AirSystemDelayPercentage", lit(AirSystemDelayPercentage))
-      .withColumn("SecurityDelayPercentage", lit(SecurityDelayPercentage))
-      .withColumn("AirlineDelayPercentage", lit(AirlineDelayPercentage))
-      .withColumn("LateAircraftDelayPercentage", lit(LateAircraftDelayPercentage))
-      .withColumn("WeatherDelayCountPercentage", lit(WeatherDelayCountPercentage))
+      .withColumn(DFColumn.AirSystemDelayPercentage, lit(AirSystemDelayPercentage))
+      .withColumn(DFColumn.SecurityDelayPercentage, lit(SecurityDelayPercentage))
+      .withColumn(DFColumn.AirlineDelayPercentage, lit(AirlineDelayPercentage))
+      .withColumn(DFColumn.LateAircraftDelayPercentage, lit(LateAircraftDelayPercentage))
+      .withColumn(DFColumn.WeatherDelayCountPercentage, lit(WeatherDelayCountPercentage))
       .select(
               col(DFColumn.AirSystemDelayPercentage),  
               col(DFColumn.SecurityDelayPercentage),

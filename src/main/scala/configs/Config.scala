@@ -5,7 +5,7 @@ import constants.ConstantPath
 trait Config {
     val isHeader: Boolean = true
     val setSeparator: Char = ','
-    val localPath = ConstantPath.HasReadPath
-    val writePath = ConstantPath.HasWritePath
+    val localPath = ConstantPath.ReadPath
+    val writePath = ConstantPath.WritePath
     val writeFormat = "parquet"
 }

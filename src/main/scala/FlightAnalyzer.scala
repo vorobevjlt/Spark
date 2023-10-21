@@ -8,27 +8,17 @@ import writers.DataFrameWriter
 import readers.DataFrameReader
 import schemas.Schema
 
-object FlightAnalyzer extends Config {
+object FlightAnalyzer extends Config with SessionWrapper{
 
-  def main(clasterPath: Array[String]): Unit = {
-    
-    clasterPath match {
-      case path if (path.length == 10 || path.length == 0) => Config(path)
-      case _ => throw new IllegalArgumentException(s"Not enough files, have to be 10 but ${clasterPath.length} found")
-    }
-
-    object Config extends Config{
-        def apply(clasterPath: Array[String] = Array()): Unit = {
-            clasterPath match {
-                case path if(path.nonEmpty) => RunConfig(path)
-                case _ => RunConfig(localPath)       
-            }
+    def main(args: Array[String]): Unit = {
+        require(args.length == 10 || args.length == 0 ,"Not enough files")    
+        
+        val readPath = args match {
+        case items if (items.length == 10) => items
+        case _ => localPath
         }
-      }
 
-    object RunConfig extends Config with SessionWrapper {
-        def apply(readPath: Array[String]): Unit = {
-            val job = new FlyghtAnalysisJob(
+        val job = new FlyghtAnalysisJob(
                         spark,
                         JobConfig(
                         DataFrameReader.ReadConfig(
@@ -119,9 +109,7 @@ object FlightAnalyzer extends Config {
                             outputFile = writePath(6),
                             format = "csv")
                         )
-            )
-            job.run()
-        }
+        )
+        job.run()
     }
-  }  
 }

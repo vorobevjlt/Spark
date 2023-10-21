@@ -18,7 +18,6 @@ object DataFrameWriter {
 }
 
 class DataFrameWriter(
-    spark: SparkSession, 
     config: DataFrameWriter.WriteConfig) extends Writer {
 
   override def write(df: DataFrame): Unit = {

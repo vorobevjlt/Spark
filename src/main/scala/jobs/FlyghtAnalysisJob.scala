@@ -99,39 +99,32 @@ class FlyghtAnalysisJob (
 
       val writeTopAirport = {
         new DataFrameWriter(
-          spark, 
           config.writeAirportConfig)
       }
 
       val writeTopAirlines = {
         new DataFrameWriter(
-          spark, 
           config.writeAirlinesConfig)
       }
 
       val writeTopFlyInOneDirectionByAirport = {
         new DataFrameWriter(
-          spark, 
           config.writetopFlyInOneDirectionByAirportConfig)
       }
       val writeTopWeekDaysByArrivalDelay = {
         new DataFrameWriter(
-          spark, 
           config.writeTopWeekDaysByArrivalDelayConfig)
       }
       val writeCountDelayReason = {
         new DataFrameWriter(
-          spark, 
           config.writeCountDelayReasonConfig)
       }
       val writeGetPercentageDelayReason = {
         new DataFrameWriter(
-          spark, 
           config.writegetPercentageDelayReasonConfig)
       }
       val writeMetaInfo = {
         new DataFrameWriter(
-          spark, 
           config.writeMetaInfoConfig)
       }
 
